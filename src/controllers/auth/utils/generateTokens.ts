@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import ms from 'ms';
 import { ITokens } from '../../../types/ITokens';
 import { ServerException } from '../../../exceptions/ServerException';
 
@@ -14,7 +15,7 @@ export const generateTokens = (userId: string): ITokens | null => {
         random,
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: process.env.TOKEN_EXPIRES },
+      { expiresIn: process.env.TOKEN_EXPIRES as ms.StringValue },
     );
 
     const refreshToken = jwt.sign(
@@ -23,7 +24,7 @@ export const generateTokens = (userId: string): ITokens | null => {
         random,
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES },
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES as ms.StringValue },
     );
     return { accessToken, refreshToken };
   } catch (error) {

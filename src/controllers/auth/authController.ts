@@ -5,6 +5,7 @@ import userModel from '../../models/usersModel';
 import { verifyRefreshToken } from './utils/verifyRefreshToken';
 import { generateAndSaveUser } from './utils/generateTokenAndSave';
 import { ServerException } from '../../exceptions/ServerException';
+import { googleSignin } from './utils/googleSignIn';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -40,6 +41,7 @@ export const login = async (req: Request, res: Response) => {
     const password = req.body.password;
 
     const user = await userModel.findOne({ email });
+    console.log('user', email);
 
     if (!user) {
       res.status(status.BAD_REQUEST).send('Wrong username or password');
@@ -62,8 +64,7 @@ export const login = async (req: Request, res: Response) => {
       return;
     }
 
-    const { accessToken, refreshToken, _id } = await generateAndSaveUser(user);
-    res.status(status.OK).send({ accessToken, refreshToken, _id });
+    await googleSignin(req, res);
   } catch (error) {
     if (error instanceof ServerException) {
       res.status(error.status).send({
@@ -97,8 +98,8 @@ export const refresh = async (req: Request, res: Response) => {
       return;
     }
 
-    const { accessToken, refreshToken, _id } = await generateAndSaveUser(user);
-    res.status(status.OK).send({ accessToken, refreshToken, _id });
+    await googleSignin(req, res);
+    // res.status(status.OK).send({ accessToken, refreshToken, _id });
   } catch (error) {
     if (error instanceof ServerException) {
       res.status(error.status).send({
