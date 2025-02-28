@@ -3,7 +3,7 @@ import { Schema, model } from 'mongoose';
 export interface IUser {
   _id?: string;
   refreshToken?: string[];
-  email: string;
+  email?: string;
   username: string;
   password: string;
   profileImage?: string;
@@ -12,7 +12,7 @@ export interface IUser {
 const userSchema = new Schema<IUser>({
   email: {
     type: String,
-    required: true,
+    sparse: true,
     unique: true,
   },
   username: {

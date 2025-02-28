@@ -29,7 +29,6 @@ type User = IUser & {
 };
 
 const testUser: User = {
-  email: 'test@user.com',
   username: 'test',
   password: 'testPassword',
 };
@@ -49,15 +48,15 @@ describe('Auth test register', () => {
     expect(response.statusCode).not.toBe(200);
   });
 
-  test('Send only email', async () => {
+  test('Send only username', async () => {
     const response = await request(app).post(`${baseUrl}/register`).send({
-      email: 'fake@email.com',
+      username: 'fake',
     });
     expect(response.statusCode).not.toBe(200);
   });
-  test('Send only empty email', async () => {
+  test('Send only empty username', async () => {
     const response = await request(app).post(`${baseUrl}/register`).send({
-      email: '',
+      username: '',
       password: 'fakePassword',
     });
     expect(response.statusCode).not.toBe(200);
@@ -91,7 +90,7 @@ describe('Auth test login', () => {
 
   test('Login fail - wrong password', async () => {
     const response = await request(app).post(`${baseUrl}/login`).send({
-      email: testUser.email,
+      username: testUser.username,
       password: 'fakePassword',
     });
     expect(response.statusCode).not.toBe(200);
@@ -99,23 +98,22 @@ describe('Auth test login', () => {
 
   test('Login fail - user does not exist', async () => {
     const response = await request(app).post(`${baseUrl}/login`).send({
-      email: 'fake@email.com',
+      username: 'fake',
       password: 'fakePassword',
     });
     expect(response.statusCode).not.toBe(200);
   });
 
-  test('Login fail - login only with email', async () => {
+  test('Login fail - login only with username', async () => {
     const responseRegister = await request(app)
       .post(`${baseUrl}/register`)
       .send({
-        email: 'fake@email.com',
-        username: 'fake',
+        username: 'fake1',
         password: '123',
       });
     expect(responseRegister.statusCode).toBe(200);
     const response = await request(app).post(`${baseUrl}/login`).send({
-      email: 'fake@email.com',
+      username: 'fake1',
     });
     expect(response.statusCode).not.toBe(200);
   });
@@ -152,7 +150,6 @@ describe('Auth test - try to send post', () => {
 
 describe('Auth test refresh', () => {
   test('Success to refresh and get tokens', async () => {
-    console.log('testUser', testUser);
     const response = await request(app).post(`${baseUrl}/refresh`).send({
       refreshToken: testUser.refreshToken,
     });

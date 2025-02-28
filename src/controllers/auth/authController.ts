@@ -10,13 +10,14 @@ import { generateAndSaveUser } from './utils/generateTokenAndSave';
 export const register = async (req: Request, res: Response) => {
   try {
     const email = req.body.email;
+    const profileImage = req.body.profileImage;
+
     const username = req.body.username;
 
-    const existingEmail = await userModel.findOne({ email });
     const existingUsername = await userModel.findOne({ username });
 
-    if (existingUsername || existingEmail) {
-      res.status(status.BAD_REQUEST).send('Username or email already exists');
+    if (existingUsername) {
+      res.status(status.BAD_REQUEST).send('Username already exists');
       return;
     }
 
@@ -26,6 +27,7 @@ export const register = async (req: Request, res: Response) => {
     const user = await userModel.create({
       email,
       username,
+      profileImage,
       password: hashedPassword,
     });
 
@@ -47,19 +49,19 @@ export const login = async (req: Request, res: Response) => {
       refreshToken: string;
       user: IUser;
     };
-    const email = req.body.email;
+    const username = req.body.username;
     const password = req.body.password;
 
     if (password) {
-      const user = await userModel.findOne({ email });
+      const user = await userModel.findOne({ username });
 
       if (!user) {
         res.status(status.BAD_REQUEST).send('Wrong username or password');
         return;
       }
 
-      if (!email || !password) {
-        res.status(status.BAD_REQUEST).send('Email or password are missing');
+      if (!username || !password) {
+        res.status(status.BAD_REQUEST).send('Username or password are missing');
         return;
       }
 

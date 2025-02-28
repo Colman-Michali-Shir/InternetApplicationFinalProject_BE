@@ -3,10 +3,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUI from 'swagger-ui-express';
+import cors from 'cors';
 import postsRoute from './routes/postsRoute';
 import commentsRoute from './routes/commentsRoute';
 import usersRoute from './routes/usersRoute';
 import authRoute from './routes/authRoute';
+import filesRoute from './routes/filesRoute';
 import { connectDatabase } from './config/connectToDatabase';
 import { authMiddleware } from './middlewares/authMiddleware';
 
@@ -24,10 +26,22 @@ export const createExpress = async () => {
     next();
   });
 
+  app.use(
+    cors({
+      origin: 'http://localhost:5173',
+      credentials: true, // Allow cookies, authorization headers, and other credentials
+      allowedHeaders: ['Authorization', 'Content-Type'],
+    }),
+  );
+
   app.use('/auth', authRoute);
   app.use('/posts', authMiddleware, postsRoute);
   app.use('/comments', authMiddleware, commentsRoute);
   app.use('/users', authMiddleware, usersRoute);
+  app.use('/file', filesRoute);
+
+  app.use('/storage', express.static('storage'));
+
   const port = process.env.PORT;
 
   if (process.env.NODE_ENV === 'development') {

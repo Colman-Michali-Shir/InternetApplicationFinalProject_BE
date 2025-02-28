@@ -14,6 +14,7 @@ export const generateAndSaveUser = async (user: IUserDocument) => {
     if (!user.refreshToken) {
       user.refreshToken = [];
     }
+
     user.refreshToken.push(tokens.refreshToken);
     await user.save();
 

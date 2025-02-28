@@ -43,6 +43,7 @@ export const verifyRefreshToken = async (
     user.refreshToken = user.refreshToken.filter(
       (token) => token !== refreshToken,
     );
+
     await user.save();
     return user;
   } catch (err) {
