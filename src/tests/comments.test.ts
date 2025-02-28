@@ -33,7 +33,7 @@ beforeAll(async () => {
   await request(app).post('/auth/register').send(testUser);
   const responseLogin = await request(app).post('/auth/login').send(testUser);
   testUser.accessToken = responseLogin.body.accessToken;
-  testUser._id = responseLogin.body._id;
+  testUser._id = responseLogin.body.user._id;
   expect(testUser.accessToken).toBeDefined();
   const defaultHeaders = {
     authorization: `JWT ${testUser.accessToken}`,
@@ -94,7 +94,7 @@ describe('Comments Tests', () => {
 
   test('Get comments by sender', async () => {
     const response = await requestWithAuth.get(
-      `/comments?sender=${testUser._id}`
+      `/comments?sender=${testUser._id}`,
     );
     expect(response.statusCode).toBe(status.OK);
     expect(response.body.length).toBe(1);
@@ -123,7 +123,7 @@ describe('Comments Tests', () => {
 
   test('Get comments by a nonexistent postId', async () => {
     const response = await requestWithAuth.get(
-      '/comments?postId=222222222222222222222222'
+      '/comments?postId=222222222222222222222222',
     );
     expect(response.statusCode).toBe(status.NOT_FOUND);
     expect(response.text).toBe('Post not found');
@@ -134,7 +134,7 @@ describe('Comments Tests', () => {
     expect(response.statusCode).toBe(status.OK);
 
     const responseCheckIfDelted = await requestWithAuth.get(
-      `/comments/${commentId}`
+      `/comments/${commentId}`,
     );
     expect(responseCheckIfDelted.statusCode).toBe(status.NOT_FOUND);
     expect(responseCheckIfDelted.text).toBe('Item not found');

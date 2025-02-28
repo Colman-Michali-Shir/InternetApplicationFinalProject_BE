@@ -7,7 +7,7 @@ export const generateAndSaveUser = async (user: IUserDocument) => {
     const tokens = generateTokens(user._id);
 
     if (!tokens) {
-      throw new ServerException();
+      throw new Error('Token secret is not configured');
     }
     const { accessToken, refreshToken } = tokens;
 
@@ -16,7 +16,8 @@ export const generateAndSaveUser = async (user: IUserDocument) => {
     }
     user.refreshToken.push(tokens.refreshToken);
     await user.save();
-    return { accessToken, refreshToken, _id: user._id };
+
+    return { accessToken, refreshToken, user };
   } catch (error) {
     if (!error) {
       throw new ServerException();

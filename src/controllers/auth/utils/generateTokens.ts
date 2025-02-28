@@ -15,7 +15,7 @@ export const generateTokens = (userId: string): ITokens | null => {
         random,
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: process.env.TOKEN_EXPIRES as ms.StringValue },
+      { expiresIn: process.env.TOKEN_EXPIRES },
     );
 
     const refreshToken = jwt.sign(
@@ -24,7 +24,7 @@ export const generateTokens = (userId: string): ITokens | null => {
         random,
       },
       process.env.TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES as ms.StringValue },
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRES },
     );
     return { accessToken, refreshToken };
   } catch (error) {

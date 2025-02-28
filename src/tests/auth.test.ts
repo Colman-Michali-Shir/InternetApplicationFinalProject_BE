@@ -73,11 +73,11 @@ describe('Auth test login', () => {
 
     expect(accessToken).toBeDefined();
     expect(refreshToken).toBeDefined();
-    expect(response.body._id).toBeDefined();
+    expect(response.body.user._id).toBeDefined();
 
     testUser.accessToken = accessToken;
     testUser.refreshToken = refreshToken;
-    testUser._id = response.body._id;
+    testUser._id = response.body.user._id;
   });
 
   test('Check tokens are not the same - new login get different tokens', async () => {
@@ -152,6 +152,7 @@ describe('Auth test - try to send post', () => {
 
 describe('Auth test refresh', () => {
   test('Success to refresh and get tokens', async () => {
+    console.log('testUser', testUser);
     const response = await request(app).post(`${baseUrl}/refresh`).send({
       refreshToken: testUser.refreshToken,
     });
@@ -192,11 +193,11 @@ describe('Auth test refresh', () => {
 
     expect(accessToken).toBeDefined();
     expect(refreshToken).toBeDefined();
-    expect(responseLogin.body._id).toBeDefined();
+    expect(responseLogin.body.user._id).toBeDefined();
 
     testUser.accessToken = accessToken;
     testUser.refreshToken = refreshToken;
-    testUser._id = responseLogin.body._id;
+    testUser._id = responseLogin.body.user._id;
 
     const firstAttemptResponse = await request(app)
       .post(`${baseUrl}/refresh`)

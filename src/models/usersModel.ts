@@ -1,11 +1,12 @@
 import { Schema, model } from 'mongoose';
 
 export interface IUser {
+  _id?: string;
+  refreshToken?: string[];
   email: string;
   username: string;
   password: string;
-  _id?: string;
-  refreshToken?: string[];
+  profileImage?: string;
 }
 
 const userSchema = new Schema<IUser>({
@@ -26,6 +27,9 @@ const userSchema = new Schema<IUser>({
   refreshToken: {
     type: [String],
     default: [],
+  },
+  profileImage: {
+    type: String,
   },
 });
 

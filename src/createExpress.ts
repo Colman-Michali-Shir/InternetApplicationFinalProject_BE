@@ -20,8 +20,10 @@ export const createExpress = async () => {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', '*');
     res.header('Access-Control-Allow-Headers', '*');
+    res.header('Access-Control-Allow-Credentials', 'true');
     next();
   });
+
   app.use('/auth', authRoute);
   app.use('/posts', authMiddleware, postsRoute);
   app.use('/comments', authMiddleware, commentsRoute);

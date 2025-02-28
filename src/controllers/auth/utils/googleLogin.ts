@@ -1,15 +1,20 @@
 import { Request, Response } from 'express';
 import { OAuth2Client } from 'google-auth-library';
-import status from 'http-status';
 
 import userModel from '../../../models/usersModel';
 import { generateAndSaveUser } from './generateTokenAndSave';
+import { ServerException } from '../../../exceptions/ServerException';
 
 const client = new OAuth2Client();
 
-export const googleSignin = async (req: Request, res: Response) => {
-  const credential = req.body?.credential;
+export const googleLogin = async (req: Request, res: Response) => {
   try {
+    const credential = req.body?.credential;
+
+    if (!credential) {
+      throw new Error('Error missing credential');
+    }
+
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -18,19 +23,21 @@ export const googleSignin = async (req: Request, res: Response) => {
 
     const email = payload?.email;
     let user = await userModel.findOne({ email });
-    console.log('111111111111111111111', email);
-    if (user === null) {
+
+    if (!user) {
       user = await userModel.create({
-        email: email,
-        imgUrl: payload?.picture,
+        email,
+        profileImage: payload?.picture,
+        username: payload?.name,
         password: 'google-signin',
       });
     }
-    const tokens = await generateAndSaveUser(user);
-    return res.status(status.OK).send(tokens);
-  } catch (err) {
-    return res
-      .status(status.BAD_REQUEST)
-      .send('error missing email or password');
+
+    return await generateAndSaveUser(user);
+  } catch (error) {
+    if (!error) {
+      throw new ServerException();
+    }
+    throw error;
   }
 };

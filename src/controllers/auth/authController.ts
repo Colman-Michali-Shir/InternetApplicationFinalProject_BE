@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
 import status from 'http-status';
 import bcrypt from 'bcrypt';
-import userModel from '../../models/usersModel';
+import userModel, { IUser } from '../../models/usersModel';
 import { verifyRefreshToken } from './utils/verifyRefreshToken';
-import { generateAndSaveUser } from './utils/generateTokenAndSave';
 import { ServerException } from '../../exceptions/ServerException';
-import { googleSignin } from './utils/googleSignIn';
+import { googleLogin } from './utils/googleLogin';
+import { generateAndSaveUser } from './utils/generateTokenAndSave';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -37,34 +37,43 @@ export const register = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   try {
-    const email = req.body.email;
-    const password = req.body.password;
-
-    const user = await userModel.findOne({ email });
-    console.log('user', email);
-
-    if (!user) {
-      res.status(status.BAD_REQUEST).send('Wrong username or password');
-      return;
-    }
-
-    if (!email || !password) {
-      res.status(status.BAD_REQUEST).send('Email or password are missing');
-      return;
-    }
-
-    const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-      res.status(status.BAD_REQUEST).send('Wrong username or password');
-      return;
-    }
-
     if (!process.env.TOKEN_SECRET) {
       res.status(status.BAD_REQUEST).send('Token secret is not configured');
       return;
     }
 
-    await googleSignin(req, res);
+    let userWithTokens: {
+      accessToken: string;
+      refreshToken: string;
+      user: IUser;
+    };
+    const email = req.body.email;
+    const password = req.body.password;
+
+    if (password) {
+      const user = await userModel.findOne({ email });
+
+      if (!user) {
+        res.status(status.BAD_REQUEST).send('Wrong username or password');
+        return;
+      }
+
+      if (!email || !password) {
+        res.status(status.BAD_REQUEST).send('Email or password are missing');
+        return;
+      }
+
+      const validPassword = await bcrypt.compare(password, user.password);
+      if (!validPassword) {
+        res.status(status.BAD_REQUEST).send('Wrong username or password');
+        return;
+      }
+
+      userWithTokens = await generateAndSaveUser(user);
+    } else {
+      userWithTokens = await googleLogin(req, res);
+    }
+    res.status(status.OK).send(userWithTokens);
   } catch (error) {
     if (error instanceof ServerException) {
       res.status(error.status).send({
@@ -98,8 +107,9 @@ export const refresh = async (req: Request, res: Response) => {
       return;
     }
 
-    await googleSignin(req, res);
-    // res.status(status.OK).send({ accessToken, refreshToken, _id });
+    const userWithTokens = await generateAndSaveUser(user);
+
+    res.status(status.OK).send(userWithTokens);
   } catch (error) {
     if (error instanceof ServerException) {
       res.status(error.status).send({
