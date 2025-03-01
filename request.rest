@@ -110,7 +110,6 @@ Authorization: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "email": "bla@c.com",
     "username": "mich",
     "password": "pp"
 }

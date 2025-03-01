@@ -12,6 +12,7 @@ export const verifyRefreshToken = async (
   if (!refreshToken) {
     throw new Error('Refresh token is missing');
   }
+
   if (!process.env.TOKEN_SECRET) {
     throw new Error('Token secret is not configured');
   }
@@ -42,6 +43,7 @@ export const verifyRefreshToken = async (
     user.refreshToken = user.refreshToken.filter(
       (token) => token !== refreshToken,
     );
+
     await user.save();
     return user;
   } catch (err) {

@@ -29,7 +29,7 @@ beforeAll(async () => {
   await request(app).post('/auth/register').send(testUser);
   const responseLogin = await request(app).post('/auth/login').send(testUser);
   testUser.accessToken = responseLogin.body.accessToken;
-  testUser._id = responseLogin.body._id;
+  testUser._id = responseLogin.body.user._id;
   expect(testUser.accessToken).toBeDefined();
 
   const defaultHeaders = {

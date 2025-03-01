@@ -33,7 +33,7 @@ beforeAll(async () => {
   await request(app).post('/auth/register').send(testUser);
   const responseLogin = await request(app).post('/auth/login').send(testUser);
   testUser.accessToken = responseLogin.body.accessToken;
-  testUser._id = responseLogin.body._id;
+  testUser._id = responseLogin.body.user._id;
   expect(testUser.accessToken).toBeDefined();
   const defaultHeaders = {
     authorization: `JWT ${testUser.accessToken}`,
@@ -111,7 +111,7 @@ describe('Posts Tests', () => {
     };
     await request(app).post('/auth/register').send(testUser);
     const responseLogin = await request(app).post('/auth/login').send(testUser);
-    await requestWithAuth.delete(`/users/${responseLogin.body._id}`);
+    await requestWithAuth.delete(`/users/${responseLogin.body.user._id}`);
 
     const responseNewPost = await request(app)
       .post('/posts')
@@ -162,7 +162,7 @@ describe('Posts Tests', () => {
 
   test('Delete Post', async () => {
     const responseCheckComments1 = await requestWithAuth.get(
-      `/comments?postId=${postId}`
+      `/comments?postId=${postId}`,
     );
 
     expect(responseCheckComments1.body.length).toBe(1);
@@ -172,13 +172,13 @@ describe('Posts Tests', () => {
     expect(response.statusCode).toBe(status.OK);
 
     const responseFindDeletedPost = await requestWithAuth.get(
-      `/posts/${postId}`
+      `/posts/${postId}`,
     );
 
     expect(responseFindDeletedPost.statusCode).toBe(status.NOT_FOUND);
 
     const responseCheckComments = await requestWithAuth.get(
-      `/comments?postId=${postId}`
+      `/comments?postId=${postId}`,
     );
 
     expect(responseCheckComments.statusCode).toBe(status.NOT_FOUND);

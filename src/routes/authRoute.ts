@@ -32,7 +32,7 @@ const router = Router();
  *     LoginUser:
  *       type: object
  *       required:
- *         - email
+ *         - username
  *         - password
  *       properties:
  *         email:
@@ -69,9 +69,8 @@ const router = Router();
  *       400:
  *         description: |
  *           Bad Request - The registration failed due to one of the following reasons:
- *           - Username or email already exists
+ *           - Username already exists
  *           - Path `username` is required
- *           - Path `email` is required
  *           - Path `password` is required
  */
 
@@ -112,7 +111,7 @@ router.post('/register', register);
  *         description: |
  *           Bad Request - The login failed due to one of the following reasons:
  *           - Wrong username or password
- *           - Email or password are missing
+ *           - Username or password are missing
  *           - Token secret is not configured
  *           - An unexpected error occurred
  *       500:

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import ms from 'ms';
 import { ITokens } from '../../../types/ITokens';
 import { ServerException } from '../../../exceptions/ServerException';
 
