@@ -34,6 +34,7 @@ class PostsController extends BaseController<IPost> {
   }
 
   async getAll(req: Request, res: Response): Promise<void> {
+    console.log(req.query);
     const { lastPostId, postedBy } = req.query as {
       lastPostId?: string;
       postedBy?: string;
