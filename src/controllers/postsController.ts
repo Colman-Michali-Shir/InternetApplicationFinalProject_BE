@@ -9,6 +9,16 @@ class PostsController extends BaseController<IPost> {
     super(postModel);
   }
 
+  async createItem(req: Request, res: Response): Promise<void> {
+    try {
+      req.body.username = req.body.postedBy.username;
+
+      super.create(req, res);
+    } catch (error) {
+      res.status(status.BAD_REQUEST).send(error);
+    }
+  }
+
   async deleteItem(req: Request, res: Response): Promise<void> {
     try {
       const postId = req.params.id;

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import status from 'http-status';
 import { Model } from 'mongoose';
+import { omit } from 'lodash';
 import userModel, { IUser } from '../models/usersModel';
 
 class BaseController<T> {
@@ -44,31 +45,35 @@ class BaseController<T> {
   }
 
   async create(req: Request, res: Response) {
-    const sender = req.body.sender;
+    const userId = req.body.userId || req.body.payload.userId;
+    const username = req.body.username;
+
     let user: IUser | null = null;
 
-    if (sender) {
-      if (mongoose.Types.ObjectId.isValid(sender)) {
-        user = await userModel.findById(sender);
-      } else {
-        user = await userModel.findOne({ username: sender });
+    if (userId) {
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        user = await userModel.findById(userId);
       }
-    } else {
-      const userId = req.body.payload.userId;
-      user = await userModel.findById(userId);
+    } else if (username) {
+      user = await userModel.findOne({ username });
     }
 
-    if (user) {
-      req.body.sender = user._id;
-    } else {
+    // if (user) {
+    //   req.body.sender = user._id;
+    // } else {
+    //   res.status(status.NOT_FOUND).send('User not found');
+    //   return;
+    // }
+
+    if (!user) {
       res.status(status.NOT_FOUND).send('User not found');
       return;
     }
 
-    const body = req.body;
+    // const body = req.body;
 
     try {
-      const item = await this.model.create(body);
+      const item = await this.model.create(omit(req.body, 'payload'));
       res.status(status.CREATED).send(item);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
