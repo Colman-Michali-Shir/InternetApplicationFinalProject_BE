@@ -44,29 +44,21 @@ class BaseController<T> {
   }
 
   async create(req: Request, res: Response) {
-    const sender = req.body.sender;
+    const userId = req.body.userId;
     let user: IUser | null = null;
 
-    if (sender) {
-      if (mongoose.Types.ObjectId.isValid(sender)) {
-        user = await userModel.findById(sender);
-      } else {
-        user = await userModel.findOne({ username: sender });
+    if (userId) {
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        user = await userModel.findById(userId);
       }
-    } else {
-      const userId = req.body.payload.userId;
-      user = await userModel.findById(userId);
     }
 
-    if (user) {
-      req.body.sender = user._id;
-    } else {
+    if (!user) {
       res.status(status.NOT_FOUND).send('User not found');
       return;
     }
 
     const body = req.body;
-
     try {
       const item = await this.model.create(body);
       res.status(status.CREATED).send(item);

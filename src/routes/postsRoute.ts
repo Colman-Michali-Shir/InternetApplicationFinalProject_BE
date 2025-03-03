@@ -46,7 +46,7 @@ const router = Router();
  * /posts:
  *   get:
  *     summary: Get all posts
- *     description: Returns the list of all the Posts or filterd by sender
+ *     description: Returns the list of all the Posts or filterd by userId
  *     tags:
  *       - Posts
  *     security:
@@ -142,7 +142,7 @@ router.get('/:id', postsController.getById.bind(postsController));
  *       '500':
  *         description: Server error
  */
-router.post('/', postsController.create.bind(postsController));
+router.post('/', postsController.createItem.bind(postsController));
 
 /**
  * @swagger

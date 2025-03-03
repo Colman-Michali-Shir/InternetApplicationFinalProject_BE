@@ -3,10 +3,42 @@ import { Request, Response } from 'express';
 import postModel, { IPost } from '../models/postsModel';
 import BaseController from './baseController';
 import commentModel from '../models/commentsModel';
+import userModel, { IUser } from '../models/usersModel';
+import mongoose from 'mongoose';
+import { getRestaurantRating } from './auth/utils/getRestaurantRating';
 
 class PostsController extends BaseController<IPost> {
   constructor() {
     super(postModel);
+  }
+
+  async createItem(req: Request, res: Response): Promise<void> {
+    try {
+      const postedBy = req.body.postedBy;
+
+      if (postedBy) {
+        if (mongoose.Types.ObjectId.isValid(postedBy)) {
+          const user: IUser | null = await userModel.findById(postedBy);
+          if (!user) {
+            res.status(status.NOT_FOUND).send('User not found');
+            return;
+          }
+        }
+      }
+      const rating = await getRestaurantRating(
+        req.body.title,
+        req.body.content,
+      );
+
+      try {
+        const item = await postModel.create({ ...req.body, rating });
+        res.status(status.CREATED).send(item);
+      } catch (error) {
+        res.status(status.BAD_REQUEST).send(error);
+      }
+    } catch (error) {
+      res.status(status.BAD_REQUEST).send(error);
+    }
   }
 
   async deleteItem(req: Request, res: Response): Promise<void> {

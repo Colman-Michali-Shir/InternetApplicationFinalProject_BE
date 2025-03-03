@@ -16,8 +16,11 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-router.post('/', upload.single('file'), (req: Request, res: Response) =>
-  res.status(status.OK).send({ url: base + req.file?.path }),
+router.post(
+  '/',
+  upload.single('file'),
+  (req: Request & { file?: Express.Multer.File }, res: Response) => {
+    if (req.file) res.status(status.OK).send({ url: base + req.file?.path });
+  },
 );
-
 export default router;
