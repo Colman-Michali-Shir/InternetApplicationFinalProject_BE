@@ -1,5 +1,5 @@
 ### JWT Token 
-@jwtToken=JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2N2M0OTRjZTEzZDQ1YTNjMzhmODFkODQiLCJyYW5kb20iOiIwLjcxODY4NTU1NTc3MTEwMjUiLCJpYXQiOjE3NDA5Mzc1NDIsImV4cCI6MTc0MDk0ODM0Mn0.9Kq9axPychGTnUOJQFWKyHhh9ci_XTFqr3GYIsmRRuE
+@jwtToken=JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzgzZTM0ZTA2YWRhYmMxODQ0NTFiY2EiLCJyYW5kb20iOiIwLjYwMTUzMzYzMzQyOTA4OTUiLCJpYXQiOjE3MzY2OTY2NTUsImV4cCI6MTczNjcwNzQ1NX0.AwEYdevOk0i4sswb7I-HdrU9OMM_mWw0D0RxUGWieHE
 
 
 ###########################################################
@@ -11,7 +11,7 @@ Authorization: {{jwtToken}}
 
 ###
 
-GET http://localhost:3000/posts?postedBy=67c494ce13d45a3c38f81d84&lastPostId=undefined
+GET http://localhost:3000/posts?sender=67815b9697a75440c50555cd
 Authorization: {{jwtToken}}
 
 ###
@@ -26,13 +26,9 @@ Authorization: {{jwtToken}}
 Content-Type: application/json
 
 {
-    "title": "new post10",
-    "postedBy": "67c494ce13d45a3c38f81d84",
-    "content": "Shir is the best",
-    "image": "https://picsum.photos/800/450?random=5",
-    "commentsCount": 10,
-    "likesCount":9,
-    "rating":4
+    "title": "sdsdirs",
+    "sender": "mich",
+    "content": "Shir is the best"
 }
 
 ###
