@@ -142,7 +142,7 @@ router.get('/:id', postsController.getById.bind(postsController));
  *       '500':
  *         description: Server error
  */
-router.post('/', postsController.createItem.bind(postsController));
+router.post('/', postsController.create.bind(postsController));
 
 /**
  * @swagger
