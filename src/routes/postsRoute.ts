@@ -53,7 +53,7 @@ const router = Router();
  *       - bearerAuth: []
  *     parameters:
  *      - in: query
- *        name: sender
+ *        name: postedBy
  *        schema:
  *          type: string
  *        required: false
