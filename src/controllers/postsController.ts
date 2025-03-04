@@ -5,7 +5,6 @@ import BaseController from './baseController';
 import commentModel from '../models/commentsModel';
 import userModel, { IUser } from '../models/usersModel';
 import mongoose from 'mongoose';
-import { getRestaurantRating } from './auth/utils/getRestaurantRating';
 
 class PostsController extends BaseController<IPost> {
   constructor() {
@@ -25,13 +24,9 @@ class PostsController extends BaseController<IPost> {
           }
         }
       }
-      const rating = await getRestaurantRating(
-        req.body.title,
-        req.body.content,
-      );
 
       try {
-        const item = await postModel.create({ ...req.body, rating });
+        const item = await postModel.create(req.body);
         res.status(status.CREATED).send(item);
       } catch (error) {
         res.status(status.BAD_REQUEST).send(error);
