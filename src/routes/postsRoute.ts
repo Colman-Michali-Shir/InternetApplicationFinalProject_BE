@@ -46,14 +46,14 @@ const router = Router();
  * /posts:
  *   get:
  *     summary: Get all posts
- *     description: Returns the list of all the Posts or filterd by sender
+ *     description: Returns the list of all the Posts or filterd by userId
  *     tags:
  *       - Posts
  *     security:
  *       - bearerAuth: []
  *     parameters:
  *      - in: query
- *        name: sender
+ *        name: postedBy
  *        schema:
  *          type: string
  *        required: false
