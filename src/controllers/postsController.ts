@@ -11,31 +11,6 @@ class PostsController extends BaseController<IPost> {
     super(postModel);
   }
 
-  async createItem(req: Request, res: Response): Promise<void> {
-    try {
-      const postedBy = req.body.postedBy;
-
-      if (postedBy) {
-        if (mongoose.Types.ObjectId.isValid(postedBy)) {
-          const user: IUser | null = await userModel.findById(postedBy);
-          if (!user) {
-            res.status(status.NOT_FOUND).send('User not found');
-            return;
-          }
-        }
-      }
-
-      try {
-        const item = await postModel.create(req.body);
-        res.status(status.CREATED).send(item);
-      } catch (error) {
-        res.status(status.BAD_REQUEST).send(error);
-      }
-    } catch (error) {
-      res.status(status.BAD_REQUEST).send(error);
-    }
-  }
-
   async deleteItem(req: Request, res: Response): Promise<void> {
     try {
       const postId = req.params.id;

@@ -43,24 +43,25 @@ class BaseController<T> {
     }
   }
 
-  async create(req: Request, res: Response) {
-    const userId = req.body.userId;
-    let user: IUser | null = null;
-
-    if (userId) {
-      if (mongoose.Types.ObjectId.isValid(userId)) {
-        user = await userModel.findById(userId);
-      }
-    }
-
-    if (!user) {
-      res.status(status.NOT_FOUND).send('User not found');
-      return;
-    }
-
-    const body = req.body;
+  async create(req: Request, res: Response): Promise<void> {
     try {
-      const item = await this.model.create(body);
+      // Determine user field dynamically (e.g., 'userId' or 'postedBy')
+      const userField = req.body.userId
+        ? 'userId'
+        : req.body.postedBy
+        ? 'postedBy'
+        : null;
+      const userId = userField ? req.body[userField] : null;
+
+      if (userId && mongoose.Types.ObjectId.isValid(userId)) {
+        const user: IUser | null = await userModel.findById(userId);
+        if (!user) {
+          res.status(status.NOT_FOUND).send('User not found');
+          return;
+        }
+      }
+
+      const item = await this.model.create(req.body);
       res.status(status.CREATED).send(item);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
