@@ -26,8 +26,8 @@ export const authMiddleware = (
       return;
     }
 
-    req.body.payload = { userId: (payload as JwtPayload)._id };
-    const user = await userModel.findById(req.body.payload.userId);
+    const userId = (payload as JwtPayload)._id;
+    const user = await userModel.findById(userId);
     if (!user) {
       res.status(status.NOT_FOUND).send('User not found');
       return;
