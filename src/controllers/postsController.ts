@@ -1,10 +1,10 @@
 import status from 'http-status';
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import postModel, { IPost } from '../models/postsModel';
 import BaseController from './baseController';
 import commentModel from '../models/commentsModel';
 import userModel, { IUser } from '../models/usersModel';
-import mongoose from 'mongoose';
 
 class PostsController extends BaseController<IPost> {
   constructor() {
