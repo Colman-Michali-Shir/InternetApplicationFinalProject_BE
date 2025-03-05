@@ -10,10 +10,12 @@ import usersRoute from './routes/usersRoute';
 import authRoute from './routes/authRoute';
 import filesRoute from './routes/filesRoute';
 import { connectDatabase } from './config/connectToDatabase';
+import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
 
 export const createExpress = async () => {
   const app = express();
+  createStorageDirectory();
   await connectDatabase();
 
   app.use(bodyParser.json());
@@ -31,7 +33,7 @@ export const createExpress = async () => {
       origin: 'http://localhost:5173',
       credentials: true, // Allow cookies, authorization headers, and other credentials
       allowedHeaders: ['Authorization', 'Content-Type'],
-    }),
+    })
   );
 
   app.use('/auth', authRoute);
