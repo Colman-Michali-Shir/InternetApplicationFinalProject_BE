@@ -47,7 +47,7 @@ class PostsController extends BaseController<IPost> {
         .limit(limit)
         .populate('postedBy', ['username', 'profileImage']);
 
-      res.status(status.OK).json({ posts });
+      res.status(status.OK).json(posts);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
     }

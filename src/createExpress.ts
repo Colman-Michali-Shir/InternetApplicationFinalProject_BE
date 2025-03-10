@@ -12,7 +12,6 @@ import filesRoute from './routes/filesRoute';
 import { connectDatabase } from './config/connectToDatabase';
 import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
-
 export const createExpress = async () => {
   const app = express();
   createStorageDirectory();
@@ -33,7 +32,9 @@ export const createExpress = async () => {
       origin: 'http://localhost:5173',
       credentials: true, // Allow cookies, authorization headers, and other credentials
       allowedHeaders: ['Authorization', 'Content-Type'],
-    })
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      maxAge: 600,
+    }),
   );
 
   app.use('/auth', authRoute);

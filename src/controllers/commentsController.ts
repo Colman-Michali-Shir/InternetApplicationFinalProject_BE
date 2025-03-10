@@ -11,10 +11,14 @@ class CommentsController extends BaseController<IComment> {
   }
 
   async getAll(req: Request, res: Response) {
-    const limit = 4;
-
     try {
-      const postId = req.query.postId;
+      const limit = 5;
+      const { postId, currentPage } = req.query as {
+        postId: string;
+        currentPage: string;
+      };
+      const skip = (Number(currentPage) - 1) * limit;
+
       if (postId) {
         const post = await postModel.findById(postId);
         if (!post) {
@@ -24,6 +28,7 @@ class CommentsController extends BaseController<IComment> {
           const comments = await commentModel
             .find({ postId })
             .sort({ _id: 1 })
+            .skip(skip)
             .limit(limit)
             .populate('userId', ['username', 'profileImage'])
             .lean();
@@ -54,6 +59,26 @@ class CommentsController extends BaseController<IComment> {
         }
       }
       super.create(req, res);
+      if (postId) {
+        await postModel.findByIdAndUpdate(postId, {
+          $inc: { commentsCount: 1 },
+        });
+      }
+    } catch (error) {
+      res.status(status.BAD_REQUEST).send(error);
+    }
+  }
+
+  async deleteItem(req: Request, res: Response) {
+    const id = req.params.id;
+    try {
+      super.deleteItem(req, res);
+      const comment = await commentModel.findById(id);
+      if (comment) {
+        await postModel.findByIdAndUpdate(comment.postId, {
+          $inc: { commentsCount: -1 },
+        });
+      }
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
     }
