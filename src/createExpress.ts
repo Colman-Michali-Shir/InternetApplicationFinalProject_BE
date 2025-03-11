@@ -12,6 +12,7 @@ import filesRoute from './routes/filesRoute';
 import { connectDatabase } from './config/connectToDatabase';
 import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
+
 export const createExpress = async () => {
   const app = express();
   createStorageDirectory();

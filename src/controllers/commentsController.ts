@@ -72,13 +72,13 @@ class CommentsController extends BaseController<IComment> {
   async deleteItem(req: Request, res: Response) {
     const id = req.params.id;
     try {
-      super.deleteItem(req, res);
       const comment = await commentModel.findById(id);
       if (comment) {
         await postModel.findByIdAndUpdate(comment.postId, {
           $inc: { commentsCount: -1 },
         });
       }
+      super.deleteItem(req, res);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
     }

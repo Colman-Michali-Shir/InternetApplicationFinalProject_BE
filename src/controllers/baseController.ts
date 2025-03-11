@@ -96,17 +96,7 @@ class BaseController<T> {
         .lean();
 
       if (updatedItem) {
-        const populatedItem = await mongoose
-          .model('Users')
-          .populate(updatedItem, {
-            path: 'userId',
-            select: ['username', 'profileImage'],
-          });
-
-        populatedItem.user = populatedItem.userId;
-        delete populatedItem.userId;
-
-        res.status(status.OK).send(populatedItem);
+        res.status(status.OK).send(updatedItem);
       } else {
         res.status(status.NOT_FOUND).send('Item not found');
       }
