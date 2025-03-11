@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import status from 'http-status';
-import { getRecommendationRestaurant } from '../controllers/auth/utils/getRecommendation';
+import { getRecommendationRestaurant } from '../controllers/recommendation/getRecommendation';
 
 const router = Router();
 

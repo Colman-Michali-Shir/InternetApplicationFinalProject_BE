@@ -33,7 +33,6 @@ export const getRecommendationRestaurant = async (
     });
 
     const response = completion.choices[0].message.content?.trim();
-    console.log(response);
 
     if (response) {
       // Use regex to extract the information with the exact format.
