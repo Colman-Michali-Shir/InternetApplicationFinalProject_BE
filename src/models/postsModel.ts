@@ -9,42 +9,45 @@ export interface IPost {
   commentsCount: number;
   likesCount: number;
   createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const postSchema = new Schema<IPost>({
-  title: {
-    type: String,
-    required: true,
+const postSchema = new Schema<IPost>(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    postedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
+      required: true,
+    },
+    content: {
+      type: String,
+      default: '',
+    },
+    image: {
+      type: String,
+      required: false,
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+      default: 1,
+    },
+    commentsCount: {
+      type: Number,
+      default: 0,
+    },
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
   },
-  postedBy: {
-    type: String,
-    ref: 'Users',
-    required: true,
-  },
-  content: String,
-  image: {
-    type: String,
-    required: false,
-  },
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5,
-    default: 1,
-  },
-  commentsCount: {
-    type: Number,
-    default: 0,
-  },
-  likesCount: {
-    type: Number,
-    default: 0,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  { timestamps: true },
+);
 
 const postModel = model<IPost>('posts', postSchema);
 

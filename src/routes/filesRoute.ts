@@ -21,7 +21,6 @@ router.post(
   upload.single('file'),
   (req: Request & { file?: Express.Multer.File }, res: Response) => {
     if (req.file) res.status(status.OK).send({ url: base + req.file?.path });
-  }
+  },
 );
-
 export default router;
