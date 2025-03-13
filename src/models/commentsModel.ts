@@ -1,11 +1,11 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 import postModel from './postsModel';
 
-export interface IComments {
+export interface IComment {
   content: string;
-  sender: string;
+  userId: mongoose.Schema.Types.ObjectId;
   postId: {
-    type: string;
+    type: mongoose.Schema.Types.ObjectId;
     ref: string;
     validate: {
       validator: (value: string) => Promise<{
@@ -16,19 +16,20 @@ export interface IComments {
   };
 }
 
-const commentSchema = new Schema<IComments>(
+const commentSchema = new Schema<IComment>(
   {
     content: {
       type: String,
       required: true,
     },
-    sender: {
-      type: String,
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Users',
       required: true,
     },
     postId: {
-      type: String,
-      ref: 'posts',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Posts',
       required: true,
       validate: {
         validator: async function (value: string) {
@@ -39,9 +40,9 @@ const commentSchema = new Schema<IComments>(
     },
   },
 
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const commentModel = model<IComments>('comments', commentSchema);
+const commentModel = model<IComment>('comments', commentSchema);
 
 export default commentModel;

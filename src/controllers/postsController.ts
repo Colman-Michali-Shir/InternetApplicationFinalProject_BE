@@ -23,6 +23,24 @@ class PostsController extends BaseController<IPost> {
     }
   }
 
+  async getById(req: Request, res: Response) {
+    const id = req.params.id;
+
+    try {
+      const item = await postModel
+        .findById(id)
+        .populate('postedBy', ['username', 'profileImage']);
+
+      if (item) {
+        res.status(status.OK).send(item);
+      } else {
+        res.status(status.NOT_FOUND).send('Item not found');
+      }
+    } catch (error) {
+      res.status(status.BAD_REQUEST).send(error);
+    }
+  }
+
   async getAll(req: Request, res: Response): Promise<void> {
     const { lastPostId, postedBy } = req.query as {
       lastPostId?: string;
@@ -47,7 +65,7 @@ class PostsController extends BaseController<IPost> {
         .limit(limit)
         .populate('postedBy', ['username', 'profileImage']);
 
-      res.status(status.OK).json({ posts });
+      res.status(status.OK).json(posts);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
     }
