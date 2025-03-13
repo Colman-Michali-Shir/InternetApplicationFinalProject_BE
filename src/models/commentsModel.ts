@@ -29,7 +29,7 @@ const commentSchema = new Schema<IComment>(
     },
     postId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'posts',
+      ref: 'Posts',
       required: true,
       validate: {
         validator: async function (value: string) {
