@@ -58,7 +58,7 @@ class CommentsController extends BaseController<IComment> {
           return;
         }
       }
-      super.create(req, res);
+      await super.create(req, res);
       if (postId) {
         await postModel.findByIdAndUpdate(postId, {
           $inc: { commentsCount: 1 },
@@ -73,12 +73,14 @@ class CommentsController extends BaseController<IComment> {
     const id = req.params.id;
     try {
       const comment = await commentModel.findById(id);
+
+      super.deleteItem(req, res);
+
       if (comment) {
         await postModel.findByIdAndUpdate(comment.postId, {
           $inc: { commentsCount: -1 },
         });
       }
-      super.deleteItem(req, res);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
     }
