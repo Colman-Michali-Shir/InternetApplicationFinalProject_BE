@@ -25,12 +25,30 @@ class PostsController extends BaseController<IPost> {
     }
   }
 
+  async getById(req: Request, res: Response) {
+    const id = req.params.id;
+
+    try {
+      const item = await postModel
+        .findById(id)
+        .populate('postedBy', ['username', 'profileImage']);
+
+      if (item) {
+        res.status(status.OK).send(item);
+      } else {
+        res.status(status.NOT_FOUND).send('Item not found');
+      }
+    } catch (error) {
+      res.status(status.BAD_REQUEST).send(error);
+    }
+  }
+
   async getAll(req: AuthRequest, res: Response): Promise<void> {
     const { lastPostId, postedBy } = req.query as {
       lastPostId?: string;
       postedBy?: string;
     };
-    const currentUserId = req.currentUser?.id;
+    const currentUserId = req.currentUser?._id;
 
     const limit = 4;
 

@@ -35,6 +35,8 @@ export const createExpress = async () => {
       origin: 'http://localhost:5173',
       credentials: true, // Allow cookies, authorization headers, and other credentials
       allowedHeaders: ['Authorization', 'Content-Type'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      maxAge: 600,
     })
   );
 

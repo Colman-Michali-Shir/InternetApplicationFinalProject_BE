@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import status from 'http-status';
 import { Model } from 'mongoose';
 import userModel, { IUser } from '../models/usersModel';
+import postModel from '../models/postsModel';
 
 class BaseController<T> {
   model: Model<T>;
@@ -90,11 +91,10 @@ class BaseController<T> {
     const body = req.body;
 
     try {
-      const updatedItem = await this.model.findByIdAndUpdate(
-        { _id: id },
-        body,
-        { returnDocument: 'after' }
-      );
+      const updatedItem = await this.model
+        .findByIdAndUpdate({ _id: id }, body, { returnDocument: 'after' })
+        .lean();
+
       if (updatedItem) {
         res.status(status.OK).send(updatedItem);
       } else {

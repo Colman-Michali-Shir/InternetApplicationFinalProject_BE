@@ -1,11 +1,11 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import status from 'http-status';
-import userModel from '../models/usersModel';
+import userModel, { IUser } from '../models/usersModel';
 import mongoose from 'mongoose';
 
 export interface AuthRequest extends Request {
-  currentUser?: { id: mongoose.Schema.Types.ObjectId };
+  currentUser?: IUser;
 }
 
 export const authMiddleware = (
@@ -31,14 +31,14 @@ export const authMiddleware = (
         return;
       }
 
-      const userId = (payload as JwtPayload)._id;
-      const user = await userModel.findById(userId);
+      req.body.payload = { userId: (payload as JwtPayload)._id };
+      const user = await userModel.findById(req.body.payload.userId);
       if (!user) {
         res.status(status.NOT_FOUND).send('User not found');
         return;
       }
 
-      req.currentUser = { id: userId };
+      req.currentUser = user;
 
       next();
     });
