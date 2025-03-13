@@ -12,6 +12,7 @@ import filesRoute from './routes/filesRoute';
 import { connectDatabase } from './config/connectToDatabase';
 import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
+import recommendationRoute from './routes/recommendationRoute';
 
 export const createExpress = async () => {
   const app = express();
@@ -42,6 +43,7 @@ export const createExpress = async () => {
   app.use('/posts', authMiddleware, postsRoute);
   app.use('/comments', authMiddleware, commentsRoute);
   app.use('/users', authMiddleware, usersRoute);
+  app.use('/recommendation', authMiddleware, recommendationRoute);
   app.use('/file', filesRoute);
 
   app.use('/storage', express.static('storage'));
