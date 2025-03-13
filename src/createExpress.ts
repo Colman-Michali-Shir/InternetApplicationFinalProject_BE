@@ -9,6 +9,7 @@ import commentsRoute from './routes/commentsRoute';
 import usersRoute from './routes/usersRoute';
 import authRoute from './routes/authRoute';
 import filesRoute from './routes/filesRoute';
+import likesRoute from './routes/likesRoute';
 import { connectDatabase } from './config/connectToDatabase';
 import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
@@ -34,7 +35,7 @@ export const createExpress = async () => {
       origin: 'http://localhost:5173',
       credentials: true, // Allow cookies, authorization headers, and other credentials
       allowedHeaders: ['Authorization', 'Content-Type'],
-    }),
+    })
   );
 
   app.use('/auth', authRoute);
@@ -42,6 +43,7 @@ export const createExpress = async () => {
   app.use('/comments', authMiddleware, commentsRoute);
   app.use('/users', authMiddleware, usersRoute);
   app.use('/recommendation', authMiddleware, recommendationRoute);
+  app.use('/likes', authMiddleware, likesRoute);
   app.use('/file', filesRoute);
 
   app.use('/storage', express.static('storage'));

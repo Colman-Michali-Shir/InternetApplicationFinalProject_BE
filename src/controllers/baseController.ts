@@ -45,13 +45,7 @@ class BaseController<T> {
 
   async create(req: Request, res: Response): Promise<void> {
     try {
-      // Determine user field dynamically (e.g., 'userId' or 'postedBy')
-      const userField = req.body.userId
-        ? 'userId'
-        : req.body.postedBy
-        ? 'postedBy'
-        : null;
-      const userId = userField ? req.body[userField] : null;
+      const userId = req.body.payload.userId;
 
       if (userId && mongoose.Types.ObjectId.isValid(userId)) {
         const user: IUser | null = await userModel.findById(userId);
@@ -60,6 +54,9 @@ class BaseController<T> {
           return;
         }
       }
+
+      req.body.userId = req.body.payload.userId;
+      delete req.body.payload;
 
       const item = await this.model.create(req.body);
       res.status(status.CREATED).send(item);
@@ -75,7 +72,7 @@ class BaseController<T> {
         { _id: id },
         {
           returnDocument: 'after',
-        },
+        }
       );
 
       if (deletedItem) {
@@ -96,7 +93,7 @@ class BaseController<T> {
       const updatedItem = await this.model.findByIdAndUpdate(
         { _id: id },
         body,
-        { returnDocument: 'after' },
+        { returnDocument: 'after' }
       );
       if (updatedItem) {
         res.status(status.OK).send(updatedItem);
