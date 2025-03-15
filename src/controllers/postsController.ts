@@ -1,6 +1,6 @@
 import status from 'http-status';
 import { Request, Response } from 'express';
-import postModel, { IPost } from '../models/postsModel';
+import postModel, { IPost, IPostClient } from '../models/postsModel';
 import BaseController from './baseController';
 import commentModel from '../models/commentsModel';
 import { AuthRequest } from '../middlewares/authMiddleware';
@@ -29,19 +29,33 @@ class PostsController extends BaseController<IPost> {
     }
   }
 
-  async getById(req: Request, res: Response) {
+  async getById(req: AuthRequest, res: Response) {
     const id = req.params.id;
+    const currentUserId = req.currentUser?._id;
 
     try {
       const item = await postModel
         .findById(id)
         .populate('postedBy', ['username', 'profileImage']);
 
-      if (item) {
-        res.status(status.OK).send(item);
-      } else {
-        res.status(status.NOT_FOUND).send('Item not found');
+      if (!item) {
+        res.status(status.NOT_FOUND).send('Post not found');
+        return;
       }
+
+      const userLike = await likeModel
+        .findOne({
+          userId: currentUserId,
+          postId: { $in: id },
+        })
+        .select('postId');
+
+      const post: IPostClient = {
+        ...item.toObject(),
+        likedByCurrentUser: userLike ? true : false,
+      };
+
+      res.status(status.OK).send(post);
     } catch (error) {
       res.status(status.BAD_REQUEST).send(error);
     }
@@ -85,9 +99,9 @@ class PostsController extends BaseController<IPost> {
         userLikes.map((like) => like.postId.toString())
       );
 
-      const postsWithLikes = posts.map((post) => ({
+      const postsWithLikes: IPostClient[] = posts.map((post) => ({
         ...post.toObject(),
-        liked: likedPostIds.has(post._id.toString()),
+        likedByCurrentUser: likedPostIds.has(post._id.toString()),
       }));
 
       res.status(status.OK).json({ posts: postsWithLikes });
