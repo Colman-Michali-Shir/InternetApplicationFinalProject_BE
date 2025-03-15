@@ -4,7 +4,7 @@ import postModel, { IPost } from '../models/postsModel';
 import BaseController from './baseController';
 import commentModel from '../models/commentsModel';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import likeModel from '../models/likesModal';
+import likeModel from '../models/likesModel';
 
 class PostsController extends BaseController<IPost> {
   constructor() {
@@ -17,6 +17,10 @@ class PostsController extends BaseController<IPost> {
       const comments = await commentModel.find({ postId });
       comments.forEach(async (comment) => {
         await commentModel.findByIdAndDelete({ _id: comment._id.toString() });
+      });
+      const likes = await likeModel.find({ postId });
+      likes.forEach(async (like) => {
+        await likeModel.findByIdAndDelete({ _id: like._id.toString() });
       });
 
       super.deleteItem(req, res);

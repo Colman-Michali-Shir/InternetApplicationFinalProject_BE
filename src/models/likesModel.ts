@@ -38,6 +38,6 @@ const likeSchema = new Schema<ILike>(
   { timestamps: true }
 );
 
-const likeModal = model<ILike>('likes', likeSchema);
+const likeModel = model<ILike>('likes', likeSchema);
 
-export default likeModal;
+export default likeModel;
