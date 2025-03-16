@@ -22,7 +22,6 @@ const router = Router();
  *     User:
  *       type: object
  *       required:
- *         - email
  *         - username
  *         - password
  *       properties:
@@ -38,11 +37,14 @@ const router = Router();
  *         refreshToken:
  *           type: array
  *           description: The User refresh tokens
+ *         profileImage:
+ *           type: string
+ *           format: binary
  *       example:
- *         email: 'user@gmail.com'
  *         username: 'user'
  *         password: '$2b$10$IeHzC7B4xTyEmUQRJ/BXfuo6JmaPqlo/KiT2E78gRD1CTKVzNReLe'
  *         refreshToken: ['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...']
+ *         profileImage: 'https:/myserver/profileImage.jpg'
  */
 
 /**

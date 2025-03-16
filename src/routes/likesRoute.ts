@@ -5,12 +5,29 @@ const router = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Likes
+ *   description: The Likes API
+ */
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
  * /likes:
  *   post:
  *     summary: Add Like on a post
  *     description: Create a like
  *     tags:
- *       - likes
+ *       - Likes
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -23,12 +40,8 @@ const router = Router();
  *               postId:
  *                 type: string
  *                 description: postId of the post to like
- *               userId:
- *                 type: string
- *                 description: The user that likes
  *             required:
  *               - postId
- *               - userId
  *     responses:
  *       '201':
  *         description: Like created successfully
@@ -50,7 +63,7 @@ router.post('/', likesController.create.bind(likesController));
  *     summary: Remove a like
  *     description: Remove a like from post of current user
  *     tags:
- *       - likes
+ *       - Likes
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -64,7 +77,9 @@ router.post('/', likesController.create.bind(likesController));
  *       '200':
  *         description: Like deleted successfully
  *       '404':
- *         description: Like not found
+ *         description: |
+ *              - Like not found
+ *              - Post not found
  *       '500':
  *         description: Server error
  */

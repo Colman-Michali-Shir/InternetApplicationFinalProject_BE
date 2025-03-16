@@ -35,14 +35,17 @@ const router = Router();
  *         - username
  *         - password
  *       properties:
- *         email:
+ *         username:
  *           type: string
- *           description: The user email
+ *           description: The user username
  *         password:
  *           type: string
  *           description: The user password
+ *         refreshToken:
+ *           type: string
+ *           description: The user refresh token
  *       example:
- *         email: 'user@gmail.com'
+ *         username: 'user'
  *         password: '$2b$10$IeHzC7B4xTyEmUQRJ/BXfuo6JmaPqlo/KiT2E78gRD1CTKVzNReLe'
  */
 
