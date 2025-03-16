@@ -9,6 +9,7 @@ import Test from 'supertest/lib/test';
 import TestAgent from 'supertest/lib/agent';
 import commentModel from '../models/commentsModel';
 import likeModel from '../models/likesModel';
+import jwt from 'jsonwebtoken';
 
 let app: Express;
 let requestWithAuth: TestAgent<Test>;
@@ -86,7 +87,7 @@ describe('Posts Tests', () => {
 
   test('Get posts by userID', async () => {
     const response = await requestWithAuth.get(
-      `/posts?postedBy=${testUser._id}`
+      `/posts?postedBy=${testUser._id}`,
     );
     expect(response.statusCode).toBe(status.OK);
     expect(response.body.posts.length).toBe(1);
@@ -127,5 +128,25 @@ describe('Posts Tests', () => {
       title: 'Updated titleeeeeeee',
       content: 'Updated content',
     });
+  });
+
+  test('Get all posts - fake access token', async () => {
+    const random = Math.random().toString();
+
+    const validTokenForUnexistsUser = jwt.sign(
+      { _id: '222222222222222222222222', random },
+      process.env.TOKEN_SECRET as string,
+      {
+        expiresIn: '1h',
+      },
+    );
+    const defaultHeaders = {
+      authorization: `JWT ${validTokenForUnexistsUser}`,
+    };
+
+    const response = await request(app).get('/posts').set(defaultHeaders);
+
+    expect(response.statusCode).toBe(status.NOT_FOUND);
+    expect(response.text).toBe('User not found');
   });
 });
