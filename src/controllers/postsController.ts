@@ -52,7 +52,7 @@ class PostsController extends BaseController<IPost> {
 
       const post: IPostClient = {
         ...item.toObject(),
-        likedByCurrentUser: userLike ? true : false,
+        likedByCurrentUser: !!userLike,
       };
 
       res.status(status.OK).send(post);
