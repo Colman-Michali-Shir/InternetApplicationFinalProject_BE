@@ -131,9 +131,10 @@ describe('Auth test - try to send post', () => {
       .post('/posts')
       .set({ authorization: 'JWT ' + responseLogin.body.accessToken })
       .send({
-        title: 'New post',
-        content: 'Important content',
-        sender: testUser._id,
+        title: 'New Post 1',
+        content: 'New Content 1',
+        postedBy: testUser._id,
+        rating: 3,
       });
     expect(responseNewPost.statusCode).toBe(201);
   });
@@ -272,14 +273,20 @@ describe('Test timeout token', () => {
       .post('/posts')
       .set({ authorization: `JWT ${testUser.accessToken}` })
       .send({
-        title: 'Test Post',
-        content: 'Test Content',
-        sender: testUser._id,
+        title: 'New Post 2',
+        content: 'New Content 2',
+        postedBy: testUser._id,
+        rating: 3,
       });
     expect(responseNewPost.statusCode).toBe(201);
   });
 
   test('Failed - time has passed', async () => {
+    const originalTokenExpires = process.env.TOKEN_EXPIRES;
+    const originalRefreshTokenExpires = process.env.REFRESH_TOKEN_EXPIRES;
+    process.env.TOKEN_EXPIRES = '1000ms';
+    process.env.REFRESH_TOKEN_EXPIRES = '4000ms';
+
     const responseLogin = await request(app)
       .post(`${baseUrl}/login`)
       .send(testUser);
@@ -293,11 +300,15 @@ describe('Test timeout token', () => {
       .post('/posts')
       .set({ authorization: `JWT ${testUser.accessToken}` })
       .send({
-        title: 'New Post',
-        content: 'Importent content',
-        sender: 'shir',
+        title: 'New Post 3',
+        content: 'New Content 3',
+        postedBy: testUser._id,
+        rating: 3,
       });
 
     expect(responseNewPost.statusCode).not.toBe(201);
+
+    process.env.TOKEN_EXPIRES = originalTokenExpires;
+    process.env.REFRESH_TOKEN_EXPIRES = originalRefreshTokenExpires;
   });
 });

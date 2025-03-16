@@ -161,16 +161,15 @@ router.get('/:id', postsController.getById.bind(postsController));
  *             required:
  *               - title
  *               - content
- *               - image
  *               - rating
+ *               - postedBy
  *             properties:
  *               title:
  *                 type: string
  *                 description: Title of the post
- *               image:
+ *               postedBy:
  *                  type: string
- *                  format: binary
- *                  description: Image of the post
+ *                  description: id of the user that creates the post
  *               rating:
  *                  type: number
  *                  description: Rating of the post
