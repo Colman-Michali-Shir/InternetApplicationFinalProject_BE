@@ -13,32 +13,41 @@ class CommentsController extends BaseController<IComment> {
   async getAll(req: Request, res: Response) {
     try {
       const limit = 5;
-      const { postId, currentPage } = req.query as {
+      const { postId, lastCommentId } = req.query as {
         postId: string;
-        currentPage: string;
+        lastCommentId: string;
       };
-      const skip = (Number(currentPage) - 1) * limit;
+
+      let query: { postId?: string; _id?: { $gt: string } } = {};
+
+      if (postId) {
+        query.postId = postId;
+      }
+
+      if (lastCommentId) {
+        query._id = { $gt: lastCommentId };
+      }
 
       if (postId) {
         const post = await postModel.findById(postId);
+
         if (!post) {
           res.status(status.NOT_FOUND).send('Post not found');
           return;
-        } else {
-          const comments = await commentModel
-            .find({ postId })
-            .sort({ _id: 1 })
-            .skip(skip)
-            .limit(limit)
-            .populate('userId', ['username', 'profileImage'])
-            .lean();
-
-          const formattedComments = comments.map(({ userId, ...rest }) => ({
-            ...rest,
-            user: userId,
-          }));
-          res.status(status.OK).json(formattedComments);
         }
+
+        const comments = await commentModel
+          .find(query)
+          .sort({ _id: 1 })
+          .limit(limit)
+          .populate('userId', ['username', 'profileImage'])
+          .lean();
+
+        const formattedComments = comments.map(({ userId, ...rest }) => ({
+          ...rest,
+          user: userId,
+        }));
+        res.status(status.OK).json(formattedComments);
       } else {
         super.getAll(req, res);
       }

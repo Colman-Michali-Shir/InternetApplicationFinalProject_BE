@@ -1,12 +1,17 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { NextFunction, Request, Response } from 'express';
 import status from 'http-status';
-import userModel from '../models/usersModel';
+import userModel, { IUser } from '../models/usersModel';
+import mongoose from 'mongoose';
+
+export interface AuthRequest extends Request {
+  currentUser?: IUser;
+}
 
 export const authMiddleware = (
-  req: Request,
+  req: AuthRequest,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
   const authorization = req.header('authorization');
   const token = authorization?.split(' ')[1];
@@ -19,20 +24,26 @@ export const authMiddleware = (
     res.status(status.INTERNAL_SERVER_ERROR).send('Server Error');
     return;
   }
+  try {
+    jwt.verify(token, process.env.TOKEN_SECRET, async (err, payload) => {
+      if (err) {
+        res.status(status.UNAUTHORIZED).send('Access Denied');
+        return;
+      }
 
-  jwt.verify(token, process.env.TOKEN_SECRET, async (err, payload) => {
-    if (err) {
-      res.status(status.UNAUTHORIZED).send('Access Denied');
-      return;
-    }
+      req.body.payload = { userId: (payload as JwtPayload)._id };
+      const user = await userModel.findById(req.body.payload.userId);
+      if (!user) {
+        res.status(status.NOT_FOUND).send('User not found');
+        return;
+      }
 
-    req.body.payload = { userId: (payload as JwtPayload)._id };
-    const user = await userModel.findById(req.body.payload.userId);
-    if (!user) {
-      res.status(status.NOT_FOUND).send('User not found');
-      return;
-    }
+      req.currentUser = user;
 
-    next();
-  });
+      next();
+    });
+  } catch (err) {
+    res.status(status.INTERNAL_SERVER_ERROR).send('Server Error');
+    return;
+  }
 };

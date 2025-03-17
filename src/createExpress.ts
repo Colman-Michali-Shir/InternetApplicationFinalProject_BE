@@ -9,6 +9,7 @@ import commentsRoute from './routes/commentsRoute';
 import usersRoute from './routes/usersRoute';
 import authRoute from './routes/authRoute';
 import filesRoute from './routes/filesRoute';
+import likesRoute from './routes/likesRoute';
 import { connectDatabase } from './config/connectToDatabase';
 import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
@@ -36,7 +37,7 @@ export const createExpress = async () => {
       allowedHeaders: ['Authorization', 'Content-Type'],
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       maxAge: 600,
-    }),
+    })
   );
 
   app.use('/auth', authRoute);
@@ -44,6 +45,7 @@ export const createExpress = async () => {
   app.use('/comments', authMiddleware, commentsRoute);
   app.use('/users', authMiddleware, usersRoute);
   app.use('/recommendation', authMiddleware, recommendationRoute);
+  app.use('/likes', authMiddleware, likesRoute);
   app.use('/file', filesRoute);
 
   app.use('/storage', express.static('storage'));
@@ -55,7 +57,7 @@ export const createExpress = async () => {
       definition: {
         openapi: '3.0.0',
         info: {
-          title: 'Web Dev 2025 REST API - Assignment 2',
+          title: 'FoodiFinder API',
           version: '1.0.0',
           description: 'REST server including authentication using JWT',
         },

@@ -12,6 +12,10 @@ export interface IPost {
   updatedAt?: Date;
 }
 
+export interface IPostClient extends IPost {
+  likedByCurrentUser: boolean;
+}
+
 const postSchema = new Schema<IPost>(
   {
     title: {
@@ -46,7 +50,7 @@ const postSchema = new Schema<IPost>(
       default: 0,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const postModel = model<IPost>('posts', postSchema);

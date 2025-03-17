@@ -73,7 +73,7 @@ class BaseController<T> {
         { _id: id },
         {
           returnDocument: 'after',
-        },
+        }
       );
 
       if (deletedItem) {
