@@ -52,7 +52,7 @@ export const login = async (req: Request, res: Response) => {
     const username = req.body.username;
     const password = req.body.password;
 
-    if (password) {
+    if (password || username) {
       const user = await userModel.findOne({ username });
 
       if (!user) {
@@ -83,7 +83,10 @@ export const login = async (req: Request, res: Response) => {
       });
       return;
     }
-    res.status(status.BAD_REQUEST).send('An unexpected error occurred');
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unexpected error occurred';
+
+    res.status(status.BAD_REQUEST).send(errorMessage);
   }
 };
 
@@ -118,10 +121,10 @@ export const refresh = async (req: Request, res: Response) => {
         error: error.message,
       });
       return;
-    } else if (error instanceof Error) {
-      res.status(status.BAD_REQUEST).send(error.message);
-      return;
     }
-    res.status(status.BAD_REQUEST).send('An unexpected error occurred');
+    const errorMessage =
+      error instanceof Error ? error.message : 'An unexpected error occurred';
+
+    res.status(status.BAD_REQUEST).send(errorMessage);
   }
 };

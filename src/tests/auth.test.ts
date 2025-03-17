@@ -5,8 +5,23 @@ import { createExpress } from '../createExpress';
 import postModel from '../models/postsModel';
 import userModel, { IUser } from '../models/usersModel';
 import status from 'http-status';
+import jwt from 'jsonwebtoken';
 
 let app: Express;
+
+jest.mock('google-auth-library', () => {
+  return {
+    OAuth2Client: jest.fn().mockImplementation(() => ({
+      verifyIdToken: jest.fn().mockResolvedValue({
+        getPayload: jest.fn().mockReturnValue({
+          email: 'testuser@gmail.com',
+          name: 'Test User',
+          picture: 'https://example.com/profile.jpg',
+        }),
+      }),
+    })),
+  };
+});
 
 beforeAll(async () => {
   console.log('before all auth tests');
@@ -115,7 +130,29 @@ describe('Auth test login', () => {
     const response = await request(app).post(`${baseUrl}/login`).send({
       username: 'fake1',
     });
-    expect(response.statusCode).not.toBe(200);
+    expect(response.statusCode).toBe(status.BAD_REQUEST);
+    expect(response.text).toBe('Username or password are missing');
+  });
+
+  describe('Google Login', () => {
+    test('Successful Google login', async () => {
+      const response = await request(app).post(`${baseUrl}/login`).send({
+        credential: 'fake_google_token',
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body.accessToken).toBeDefined();
+      expect(response.body.refreshToken).toBeDefined();
+      expect(response.body.user.email).toBe('testuser@gmail.com');
+      expect(response.body.user.username).toBe('Test User');
+    });
+
+    test('Fail Google login - missing credential', async () => {
+      const response = await request(app).post(`${baseUrl}/login`).send({});
+
+      expect(response.statusCode).toBe(status.BAD_REQUEST);
+      expect(response.text).toBe('Error missing credential');
+    });
   });
 });
 
@@ -131,9 +168,10 @@ describe('Auth test - try to send post', () => {
       .post('/posts')
       .set({ authorization: 'JWT ' + responseLogin.body.accessToken })
       .send({
-        title: 'New post',
-        content: 'Important content',
-        sender: testUser._id,
+        title: 'New Post 1',
+        content: 'New Content 1',
+        postedBy: testUser._id,
+        rating: 3,
       });
     expect(responseNewPost.statusCode).toBe(201);
   });
@@ -225,6 +263,42 @@ describe('Auth test refresh', () => {
     // no refresh tokens
     expect(responseRemoveRefreshToken.statusCode).not.toBe(200);
   });
+
+  test('Invalid refresh token', async () => {
+    const invalidToken = jwt.sign(
+      { notUserId: '222222222222222222222222' },
+      process.env.TOKEN_SECRET as string,
+      {
+        expiresIn: '1h',
+      }
+    );
+
+    const response = await request(app).post(`${baseUrl}/refresh`).send({
+      refreshToken: invalidToken,
+    });
+
+    expect(response.statusCode).toBe(status.BAD_REQUEST);
+    expect(response.text).toBe('Invalid refresh token');
+  });
+
+  test('Fake refresh token', async () => {
+    const random = Math.random().toString();
+
+    const validTokenForUnexistsUser = jwt.sign(
+      { _id: '222222222222222222222222', random },
+      process.env.TOKEN_SECRET as string,
+      {
+        expiresIn: '1h',
+      }
+    );
+
+    const response = await request(app).post(`${baseUrl}/refresh`).send({
+      refreshToken: validTokenForUnexistsUser,
+    });
+
+    expect(response.statusCode).toBe(status.BAD_REQUEST);
+    expect(response.text).toBe('User not found');
+  });
 });
 
 describe('Auth test logout', () => {
@@ -272,14 +346,20 @@ describe('Test timeout token', () => {
       .post('/posts')
       .set({ authorization: `JWT ${testUser.accessToken}` })
       .send({
-        title: 'Test Post',
-        content: 'Test Content',
-        sender: testUser._id,
+        title: 'New Post 2',
+        content: 'New Content 2',
+        postedBy: testUser._id,
+        rating: 3,
       });
     expect(responseNewPost.statusCode).toBe(201);
   });
 
   test('Failed - time has passed', async () => {
+    const originalTokenExpires = process.env.TOKEN_EXPIRES;
+    const originalRefreshTokenExpires = process.env.REFRESH_TOKEN_EXPIRES;
+    process.env.TOKEN_EXPIRES = '1000ms';
+    process.env.REFRESH_TOKEN_EXPIRES = '4000ms';
+
     const responseLogin = await request(app)
       .post(`${baseUrl}/login`)
       .send(testUser);
@@ -293,11 +373,15 @@ describe('Test timeout token', () => {
       .post('/posts')
       .set({ authorization: `JWT ${testUser.accessToken}` })
       .send({
-        title: 'New Post',
-        content: 'Importent content',
-        sender: 'shir',
+        title: 'New Post 3',
+        content: 'New Content 3',
+        postedBy: testUser._id,
+        rating: 3,
       });
 
     expect(responseNewPost.statusCode).not.toBe(201);
+
+    process.env.TOKEN_EXPIRES = originalTokenExpires;
+    process.env.REFRESH_TOKEN_EXPIRES = originalRefreshTokenExpires;
   });
 });

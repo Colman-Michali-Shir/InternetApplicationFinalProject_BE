@@ -28,21 +28,21 @@ const router = Router();
  *       type: object
  *       required:
  *         - content
- *         - sender
+ *         - userId
  *         - postId
  *       properties:
  *         content:
  *           type: string
  *           description: The comment content
- *         sender:
+ *         userId:
  *           type: string
- *           description: The comment sender
+ *           description: The comment userId
  *         postId:
  *           type: string
  *           description: The comment postId
  *       example:
  *         content: 'This is a comment'
- *         sender: 'shir'
+ *         userId: '65d1234567890abcdef12345'
  *         postId: '60f1b0b3b3f3b40015f1f3b3'
  */
 
@@ -50,7 +50,7 @@ const router = Router();
  * @swagger
  * /comments:
  *   get:
- *     summary: Get all comments
+ *     summary: Get all comments or filter by postId
  *     description: Returns the list of all the comments or filterd by postId
  *     tags:
  *       - Comments
@@ -130,15 +130,11 @@ router.get('/:id', commentsController.getById.bind(commentsController));
  *               postId:
  *                 type: string
  *                 description: postId of the post to comment on
- *               sender:
- *                 type: string
- *                 description: The sender of the comment
  *               content:
  *                 type: string
  *                 description: The content of the comment
  *             required:
  *               - postId
- *               - sender
  *               - content
  *     responses:
  *       '201':

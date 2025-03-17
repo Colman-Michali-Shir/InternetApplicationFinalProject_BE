@@ -18,34 +18,73 @@ const router = Router();
  *       type: http
  *       scheme: bearer
  *       bearerFormat: JWT
+ */
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
  *     Post:
  *       type: object
  *       required:
  *         - content
- *         - sender
  *         - title
+ *         - rating
+ *         - image
  *       properties:
  *         content:
  *           type: string
  *           description: The Post content
- *         sender:
- *           type: string
- *           description: The Post sender
+ *         postedBy:
+ *           type: object
+ *           properties:
+ *              id:
+ *               type: string
+ *               description: The user id that added the post
+ *              username:
+ *               type: string
+ *               description: The user name that added the post
+ *              profileImage:
+ *               type: string
+ *               description: The user profile image that added the post
  *         title:
  *           type: string
  *           description: The Post title
+ *         rating:
+ *           type: number
+ *           description: The Post rating
+ *         image:
+ *           type: string
+ *           description: The Post image
+ *         likesCount:
+ *           type: number
+ *           description: The Post likes count
+ *         commentsCount:
+ *           type: number
+ *           description: The Post comments count
  *       example:
  *         content: 'This is a Post'
- *         sender: 'shir'
- *         title: 'Shirs post'
+ *         postedBy:
+ *          id: '60f7b3b4b3f3b40015f1f3b4'
+ *          username: 'user'
+ *          profileImage: 'https://server.com/image.jpg'
+ *         title: 'Users post'
+ *         rating: 5
+ *         image: 'https://server.com/image.jpg'
+ *         likesCount: 0
+ *         commentsCount: 0
  */
 
 /**
  * @swagger
  * /posts:
  *   get:
- *     summary: Get all posts
+ *     summary: Get all posts or filter by userId
  *     description: Returns the list of all the Posts or filterd by userId
  *     tags:
  *       - Posts
@@ -57,7 +96,7 @@ const router = Router();
  *        schema:
  *          type: string
  *        required: false
- *        description: The sender ID to filter by
+ *        description: The postedBy ID to filter by
  *     responses:
  *       '200':
  *         description: A list of the posts or filterd
@@ -122,13 +161,18 @@ router.get('/:id', postsController.getById.bind(postsController));
  *             required:
  *               - title
  *               - content
+ *               - rating
+ *               - postedBy
  *             properties:
  *               title:
  *                 type: string
  *                 description: Title of the post
- *               sender:
- *                 type: string
- *                 description: The sender of the post
+ *               postedBy:
+ *                  type: string
+ *                  description: id of the user that creates the post
+ *               rating:
+ *                  type: number
+ *                  description: Rating of the post
  *               content:
  *                 type: string
  *                 description: The content of the post
@@ -205,6 +249,12 @@ router.delete('/:id', postsController.deleteItem.bind(postsController));
  *               title:
  *                 type: string
  *                 description: The new title of the post
+ *               rating:
+ *                 type: number
+ *                 description: The new rating of the post
+ *               image:
+ *                 type: string
+ *                 description: The new image of the post
  *     responses:
  *       '200':
  *         description: Post updated successfully

@@ -16,6 +16,12 @@ import { authMiddleware } from './middlewares/authMiddleware';
 import recommendationRoute from './routes/recommendationRoute';
 
 export const createExpress = async () => {
+  if (process.env.NODE_ENV === 'test') {
+    require('dotenv').config({ path: '.env.test.local' });
+  } else if (process.env.NODE_ENV === 'development') {
+    require('dotenv').config({ path: '.env.development.local' });
+  }
+
   const app = express();
   createStorageDirectory();
   await connectDatabase();
@@ -30,15 +36,18 @@ export const createExpress = async () => {
     next();
   });
 
-  app.use(
-    cors({
-      origin: 'http://localhost:5173',
-      credentials: true, // Allow cookies, authorization headers, and other credentials
-      allowedHeaders: ['Authorization', 'Content-Type'],
-      methods: ['GET', 'POST', 'PUT', 'DELETE'],
-      maxAge: 600,
-    })
-  );
+  if (process.env.NODE_ENV === 'development') {
+    console.log('CORS enabled for development');
+    app.use(
+      cors({
+        origin: 'http://localhost:5173',
+        credentials: true, // Allow cookies, authorization headers, and other credentials
+        allowedHeaders: ['Authorization', 'Content-Type'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        maxAge: 600,
+      })
+    );
+  }
 
   app.use('/auth', authRoute);
   app.use('/posts', authMiddleware, postsRoute);
