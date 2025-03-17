@@ -130,7 +130,6 @@ describe('Auth test login', () => {
     const response = await request(app).post(`${baseUrl}/login`).send({
       username: 'fake1',
     });
-    // expect(response.statusCode).not.toBe(200);
     expect(response.statusCode).toBe(status.BAD_REQUEST);
     expect(response.text).toBe('Username or password are missing');
   });
@@ -271,7 +270,7 @@ describe('Auth test refresh', () => {
       process.env.TOKEN_SECRET as string,
       {
         expiresIn: '1h',
-      },
+      }
     );
 
     const response = await request(app).post(`${baseUrl}/refresh`).send({
@@ -290,7 +289,7 @@ describe('Auth test refresh', () => {
       process.env.TOKEN_SECRET as string,
       {
         expiresIn: '1h',
-      },
+      }
     );
 
     const response = await request(app).post(`${baseUrl}/refresh`).send({
