@@ -13,11 +13,12 @@ export const getRecommendationRestaurant = async (
   description: string,
 ): Promise<{ name: string; description: string; url?: string }> => {
   try {
-    const prompt = `I am looking for a restaurant recommendation based on this description: "${description}". Please provide the following information in this exact format:
-    **Restaurant Name:** [name of the restaurant]
-    **Description:** [brief description of the restaurant]
-    **URL:** [restaurant website or relevant link]
-    Each section should be on a new line, and the description should be 20-30 words long.`;
+    const prompt = `I am looking for a restaurant recommendation based on this description: "${description}". Please respond in JSON format with the following structure:
+    {
+      "name": "Restaurant Name",
+      "description": "A brief description of the restaurant (20-30 words).",
+      "url": "Restaurant website or relevant link (if available)"
+    }`;
 
     const messages: { role: 'system' | 'user'; content: string }[] = [
       {
@@ -30,26 +31,14 @@ export const getRecommendationRestaurant = async (
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages,
+      response_format: { type: 'json_object' },
     });
 
-    const response = completion.choices[0].message.content?.trim();
-
-    if (response) {
-      // Use regex to extract the information with the exact format.
-      const nameMatch = response.match(/\*\*Restaurant Name:\*\*\s*(.+)/);
-      const descriptionMatch = response.match(/\*\*Description:\*\*\s*(.+)/);
-      const urlMatch = response.match(/\*\*URL:\*\*\s*\[([^\]]+)\]/);
-
-      const name = nameMatch ? nameMatch[1].trim() : '';
-      const description = descriptionMatch ? descriptionMatch[1].trim() : '';
-      const url = urlMatch ? urlMatch[1].trim() : undefined;
-
-      return { name, description, url };
-    }
-
-    throw new Error(
-      "Can't extract restaurant name, description, and URL properly",
-    );
+    return completion.choices[0].message.content as unknown as {
+      name: string;
+      description: string;
+      url?: string;
+    };
   } catch (error) {
     throw error;
   }
