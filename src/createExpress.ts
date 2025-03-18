@@ -16,11 +16,6 @@ import { authMiddleware } from './middlewares/authMiddleware';
 import recommendationRoute from './routes/recommendationRoute';
 
 export const createExpress = async () => {
-  if (process.env.NODE_ENV === 'test') {
-    require('dotenv').config({ path: '.env.test.local' });
-  } else if (process.env.NODE_ENV === 'development') {
-    require('dotenv').config({ path: '.env.development.local' });
-  }
 
   const app = express();
   createStorageDirectory();
@@ -61,7 +56,7 @@ export const createExpress = async () => {
 
   const port = process.env.PORT;
 
-  if (process.env.NODE_ENV === 'development') {
+ 
     const options = {
       definition: {
         openapi: '3.0.0',
@@ -70,13 +65,17 @@ export const createExpress = async () => {
           version: '1.0.0',
           description: 'REST server including authentication using JWT',
         },
-        servers: [{ url: `http://localhost:${port}` }],
+        servers: [{ url: `http://localhost:${port}` },
+          {url: "http://10.10.246.20"},
+          {url: "https://10.10.246.20"}
+        ],
+        
       },
       apis: ['./src/routes/*.ts'],
     };
     const specs = swaggerJsDoc(options);
     app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
-  }
+  
 
   return app;
 };
