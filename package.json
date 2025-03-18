@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/app.ts",
+  "homepage": ".",
   "scripts": {
     "prod": "cp .env.prod .env && tsc -p tsconfig_prod.json && pm2 restart ecosystem.config.js --env production",
     "dev": "cp .env.development.local .env && nodemon --exec ts-node src/app.ts",

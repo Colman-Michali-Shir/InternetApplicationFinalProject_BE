@@ -14,6 +14,7 @@ import { connectDatabase } from './config/connectToDatabase';
 import { createStorageDirectory } from './config/createStorageDirectory';
 import { authMiddleware } from './middlewares/authMiddleware';
 import recommendationRoute from './routes/recommendationRoute';
+import path from 'path';
 
 export const createExpress = async () => {
 
@@ -31,18 +32,31 @@ export const createExpress = async () => {
     next();
   });
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log('CORS enabled for development');
-    app.use(
-      cors({
-        origin: 'http://localhost:5173',
-        credentials: true, 
-        allowedHeaders: ['Authorization', 'Content-Type'],
-        methods: ['GET', 'POST', 'PUT', 'DELETE'],
-        maxAge: 600,
-      })
-    );
-  }
+
+  const allowedOrigins = [
+    'https://10.10.246.20',
+    'https://node20.cs.colman.ac.il',
+    'https://193.106.55.180'
+  ];
+  
+
+  app.use(express.static(path.resolve('front')));
+
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
+      credentials: true,
+      allowedHeaders: ['Authorization', 'Content-Type'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      maxAge: 600,
+    })
+  );
 
   app.use('/auth', authRoute);
   app.use('/posts', authMiddleware, postsRoute);
@@ -53,7 +67,12 @@ export const createExpress = async () => {
   app.use('/file', filesRoute);
 
   app.use('/storage', express.static('storage'));
-  app.use(express.static("front"));
+
+  // Catch-all route to serve index.html for React routes
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve('front', 'index.html'));
+  });
+ 
 
   const port = process.env.PORT;
 
@@ -68,7 +87,7 @@ export const createExpress = async () => {
         },
         servers: [{ url: `http://localhost:${port}` },
           {url: "http://10.10.246.20"},
-          {url: "https://10.10.246.20"}
+          {url: "https://node20.cs.colman.ac.il"}
         ],
         
       },
