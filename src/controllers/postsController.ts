@@ -68,21 +68,21 @@ class PostsController extends BaseController<IPost> {
     };
     const currentUserId = req.currentUser?._id;
 
-    const limit = 4;
+    const limit = 5;
 
     try {
-      let query: { postedBy?: string; _id?: { $gt: string } } = {};
+      let query: { postedBy?: string; _id?: { $lt: string } } = {};
       if (postedBy) {
         query.postedBy = postedBy;
       }
 
       if (lastPostId) {
-        query._id = { $gt: lastPostId };
+        query._id = { $lt: lastPostId };
       }
 
       const posts = await postModel
         .find(query)
-        .sort({ _id: 1 })
+        .sort({ _id: -1 })
         .limit(limit)
         .populate('postedBy', ['username', 'profileImage']);
 
@@ -96,7 +96,7 @@ class PostsController extends BaseController<IPost> {
         .select('postId');
 
       const likedPostIds = new Set(
-        userLikes.map((like) => like.postId.toString())
+        userLikes.map((like) => like.postId.toString()),
       );
 
       const postsWithLikes: IPostClient[] = posts.map((post) => ({

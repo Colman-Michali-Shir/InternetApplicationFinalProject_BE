@@ -17,7 +17,6 @@ import recommendationRoute from './routes/recommendationRoute';
 import path from 'path';
 
 export const createExpress = async () => {
-
   const app = express();
   createStorageDirectory();
   await connectDatabase();
@@ -32,13 +31,12 @@ export const createExpress = async () => {
     next();
   });
 
-
   const allowedOrigins = [
     'https://10.10.246.20',
     'https://node20.cs.colman.ac.il',
-    'https://193.106.55.180'
+    'https://193.106.55.180',
+    'http://localhost:5173',
   ];
-  
 
   app.use(express.static(path.resolve('front')));
 
@@ -55,7 +53,7 @@ export const createExpress = async () => {
       allowedHeaders: ['Authorization', 'Content-Type'],
       methods: ['GET', 'POST', 'PUT', 'DELETE'],
       maxAge: 600,
-    })
+    }),
   );
 
   app.use('/auth', authRoute);
@@ -72,30 +70,27 @@ export const createExpress = async () => {
   app.get('*', (req, res) => {
     res.sendFile(path.resolve('front', 'index.html'));
   });
- 
 
   const port = process.env.PORT;
 
- 
-    const options = {
-      definition: {
-        openapi: '3.0.0',
-        info: {
-          title: 'FoodiFinder API',
-          version: '1.0.0',
-          description: 'REST server including authentication using JWT',
-        },
-        servers: [{ url: `http://localhost:${port}` },
-          {url: "http://10.10.246.20"},
-          {url: "https://node20.cs.colman.ac.il"}
-        ],
-        
+  const options = {
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'FoodiFinder API',
+        version: '1.0.0',
+        description: 'REST server including authentication using JWT',
       },
-      apis: ['./src/routes/*.ts'],
-    };
-    const specs = swaggerJsDoc(options);
-    app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
-  
+      servers: [
+        { url: `http://localhost:${port}` },
+        { url: 'http://10.10.246.20' },
+        { url: 'https://node20.cs.colman.ac.il' },
+      ],
+    },
+    apis: ['./src/routes/*.ts'],
+  };
+  const specs = swaggerJsDoc(options);
+  app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
 
   return app;
 };
